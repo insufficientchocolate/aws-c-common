@@ -70,7 +70,9 @@ time_t aws_timegm(struct tm *const t) {
 #else
 
 /* glibc.... you disappoint me.. */
+#    ifndef __APPLE__
 extern time_t timegm(struct tm *);
+#    endif
 
 time_t aws_timegm(struct tm *const t) {
     return timegm(t);
