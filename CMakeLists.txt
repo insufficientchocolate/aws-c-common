@@ -171,24 +171,35 @@ foreach(HEADER_SRCPATH IN ITEMS ${AWS_COMMON_HEADERS} ${AWS_COMMON_OS_HEADERS} $
     install(FILES ${HEADER_SRCPATH} DESTINATION ${HEADER_DSTDIR})
 endforeach()
 
-set(LIBRARY_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib)
+# Introduce:
+# * CMAKE_INSTALL_LIBDIR
+include(GNUInstallDirs)
+set(generated_config "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake")
+set(config_install_dir "${CAMKE_INSTALL_LIBDIR}/cmake")
 
 install(TARGETS ${CMAKE_PROJECT_NAME}
     EXPORT ${CMAKE_PROJECT_NAME}-targets
-    ARCHIVE DESTINATION ${LIBRARY_DIRECTORY}
-    LIBRARY DESTINATION ${LIBRARY_DIRECTORY}
-    RUNTIME DESTINATION ${LIBRARY_DIRECTORY})
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-configure_file("cmake/${CMAKE_PROJECT_NAME}-config.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake"
-  @ONLY)
+#configure_file("cmake/${CMAKE_PROJECT_NAME}-config.cmake"
+  #"${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake"
+  #@ONLY)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+	"cmake/${CMAKE_PROJECT_NAME}-config.cmake"
+	"${generated_config}"
+	INSTALL_DESTINATION ${config_install_dir}
+)
 
 install(EXPORT "${CMAKE_PROJECT_NAME}-targets"
-    DESTINATION "${LIBRARY_DIRECTORY}/${CMAKE_PROJECT_NAME}/cmake/"
+    DESTINATION "${config_install_dir}"
     NAMESPACE AWS::)
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake"
-    DESTINATION "${LIBRARY_DIRECTORY}/${CMAKE_PROJECT_NAME}/cmake/")
+    DESTINATION "${config_install_dir}")
 
 list(APPEND EXPORT_MODULES
     "cmake/AwsCFlags.cmake"
