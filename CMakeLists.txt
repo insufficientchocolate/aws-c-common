@@ -11,7 +11,7 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.3)
 project(aws-c-common LANGUAGES C VERSION 0.1.0)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -186,11 +186,15 @@ set(PROJECT_CONFIG_FILE_TEMPLATE "cmake/${CMAKE_PROJECT_NAME}-config.cmake")
 set(GENERATED_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}-config.cmake")
 set(CONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME}")
 
-
+set(MODULE_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake")
+# Use:
+# * CMAKE_PROJECT_NAME
+# * MODULE_INSTALL_DIR
 configure_package_config_file(
   "${PROJECT_CONFIG_FILE_TEMPLATE}"
   "${GENERATED_PROJECT_CONFIG_FILE}"
-  INSTALL_DESTINATION "${CONFIG_INSTALL_DIR}")
+  INSTALL_DESTINATION "${CONFIG_INSTALL_DIR}"
+  PATH_VARS MODULE_INSTALL_DIR)
 
 install(EXPORT "${CMAKE_PROJECT_NAME}-targets"
   DESTINATION "${CONFIG_INSTALL_DIR}"
@@ -209,9 +213,8 @@ list(APPEND EXPORT_MODULES
     "cmake/AwsSanitizers.cmake"
     "cmake/AwsSIMD.cmake"
     )
-
 install(FILES ${EXPORT_MODULES}
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
+        DESTINATION "${MODULE_INSTALL_DIR}"
         COMPONENT Development)
 
 if (NOT CMAKE_CROSSCOMPILING)
